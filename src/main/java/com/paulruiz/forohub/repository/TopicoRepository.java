@@ -13,23 +13,26 @@ import java.util.Optional;
 @Repository
 public interface TopicoRepository extends JpaRepository<Topico, Long> {
 
-    // Método del Paso 3
+    // Métodos anteriores
     boolean existsByTituloAndMensaje(String titulo, String mensaje);
 
     Optional<Topico> findByTituloAndMensaje(String titulo, String mensaje);
 
     // ============================================
-    // NUEVOS MÉTODOS - Paso 4 (Opcionales)
+    // NUEVO - Para validar duplicados al actualizar
     // ============================================
 
     /**
-     * Buscar tópicos por nombre del curso
-     * Ejemplo: /topicos/buscar?curso=Spring Boot
+     * Verifica si existe otro tópico con el mismo título y mensaje
+     * excluyendo el tópico que se está actualizando
      *
-     * @param nombreCurso Nombre del curso (case-insensitive)
-     * @param paginacion Configuración de paginación
-     * @return Página de tópicos filtrados
+     * @param titulo Título del tópico
+     * @param mensaje Mensaje del tópico
+     * @param id ID del tópico que se está actualizando (para excluirlo)
+     * @return true si existe otro tópico duplicado
      */
+    boolean existsByTituloAndMensajeAndIdNot(String titulo, String mensaje, Long id);
+
     Page<Topico> findByCursoNombreContainingIgnoreCase(
             String nombreCurso,
             Pageable paginacion);
@@ -63,4 +66,9 @@ public interface TopicoRepository extends JpaRepository<Topico, Long> {
             @Param("nombreCurso") String nombreCurso,
             @Param("anio") Integer anio,
             Pageable paginacion);
+
+
+
+
+
 }

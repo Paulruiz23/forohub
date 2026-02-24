@@ -1,5 +1,6 @@
 package com.paulruiz.forohub.controller;
 
+import com.paulruiz.forohub.dto.ActualizarTopicoDTO;
 import com.paulruiz.forohub.dto.DetalleTopicoDTO;
 import com.paulruiz.forohub.dto.TopicoDTO;
 import com.paulruiz.forohub.infra.errores.EntityNotFoundException;
@@ -129,5 +130,72 @@ public class TopicoController {
         // 3. Retornar respuesta 200 OK
         // ============================================
         return ResponseEntity.ok(detalleDTO);
+    }
+
+    // ============================================
+// PUT - Actualizar tópico (NUEVO - Paso 6)
+// ============================================
+
+    /**
+     * PUT /topicos/{id} - Actualizar un tópico existente
+     *
+     * @param id ID del tópico a actualizar
+     * @param actualizarDTO Datos a actualizar
+     * @return ResponseEntity con el tópico actualizado
+     *
+     * Ejemplo en Insomnia:
+     * PUT http://localhost:8080/topicos/1
+     * Body:
+     * {
+     *   "titulo": "¿Cómo configurar Spring Security?",
+     *   "mensaje": "Necesito ayuda urgente con la configuración",
+     *   "cursoId": 1
+     * }
+     */
+    @PutMapping("/{id}")
+    @Transactional
+    public ResponseEntity<DetalleTopicoDTO> actualizarTopico(
+            @PathVariable Long id,
+            @RequestBody @Valid ActualizarTopicoDTO actualizarDTO) {
+
+        // ============================================
+        // 1. Verificar que el tópico existe
+        // ============================================
+        Topico topico = topicoRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Tópico con ID " + id + " no encontrado"));
+
+        // ============================================
+        // 2. VALIDACIÓN: No permitir duplicados
+        // ============================================
+        // Verificar si existe otro tópico con mismo título y mensaje
+        // (excluyendo el tópico actual)
+        if (topicoRepository.existsByTituloAndMensajeAndIdNot(
+                actualizarDTO.titulo(),
+                actualizarDTO.mensaje(),
+                id)) {
+            // Si existe otro tópico duplicado, retornar error 400
+            return ResponseEntity.badRequest().build();
+        }
+
+        // ============================================
+        // 3. VALIDACIÓN: Verificar que el curso existe
+        // ============================================
+        Curso curso = cursoRepository.findById(actualizarDTO.cursoId())
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Curso con ID " + actualizarDTO.cursoId() + " no encontrado"));
+
+        // ============================================
+        // 4. Actualizar los datos del tópico
+        // ============================================
+        topico.actualizarDatos(actualizarDTO, curso);
+
+        // No es necesario llamar a save() porque @Transactional
+        // guarda automáticamente los cambios al final del método
+
+        // ============================================
+        // 5. Retornar respuesta 200 OK con datos actualizados
+        // ============================================
+        return ResponseEntity.ok(new DetalleTopicoDTO(topico));
     }
 }

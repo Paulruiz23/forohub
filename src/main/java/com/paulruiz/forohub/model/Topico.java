@@ -1,16 +1,10 @@
 package com.paulruiz.forohub.model;
 
+import com.paulruiz.forohub.dto.ActualizarTopicoDTO;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
 
-/**
- * Entidad que representa un tópico/pregunta del foro
- * Relaciones:
- * - ManyToOne con Usuario (autor)
- * - ManyToOne con Curso
- * - OneToMany con Respuesta (no implementado aún)
- */
 @Entity
 @Table(name = "topicos")
 @Getter
@@ -33,33 +27,49 @@ public class Topico {
     @Column(name = "fecha_creacion", nullable = false)
     private LocalDateTime fechaCreacion;
 
-    @Enumerated(EnumType.STRING) // Guarda el nombre del enum (NO_RESPONDIDO) en la BD
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 50)
     private StatusTopico status;
 
-    // Relación: Un tópico pertenece a un autor (Usuario)
-    @ManyToOne(fetch = FetchType.LAZY) // LAZY: carga el usuario solo cuando lo necesites
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "autor_id", nullable = false)
     private Usuario autor;
 
-    // Relación: Un tópico pertenece a un curso
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "curso_id", nullable = false)
     private Curso curso;
 
-    /**
-     * Método ejecutado automáticamente antes de persistir en BD
-     * Asigna valores por defecto
-     */
     @PrePersist
     public void prePersist() {
-        // Si no se especifica fecha, usar la actual
         if (fechaCreacion == null) {
             fechaCreacion = LocalDateTime.now();
         }
-        // Si no se especifica status, usar NO_RESPONDIDO
         if (status == null) {
             status = StatusTopico.NO_RESPONDIDO;
+        }
+    }
+
+    // ============================================
+    // MÉTODO NUEVO - Para actualizar datos
+    // ============================================
+
+    /**
+     * Actualiza los datos del tópico
+     * Solo actualiza los campos que no sean null
+     *
+     * @param datos DTO con los nuevos datos
+     * @param curso Nuevo curso (si se cambió)
+     */
+    public void actualizarDatos(ActualizarTopicoDTO datos, Curso curso) {
+        // Actualizar solo si se enviaron nuevos datos
+        if (datos.titulo() != null) {
+            this.titulo = datos.titulo();
+        }
+        if (datos.mensaje() != null) {
+            this.mensaje = datos.mensaje();
+        }
+        if (curso != null) {
+            this.curso = curso;
         }
     }
 }
