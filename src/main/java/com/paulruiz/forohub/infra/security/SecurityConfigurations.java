@@ -12,10 +12,8 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-/**
- * Configuración de seguridad de la aplicación
- */
 @Configuration
 @EnableWebSecurity
 public class SecurityConfigurations {
@@ -23,46 +21,38 @@ public class SecurityConfigurations {
     @Autowired
     private AutenticacionService autenticacionService;
 
-    /**
-     * Configura la cadena de filtros de seguridad
-     */
+    @Autowired
+    private SecurityFilter securityFilter;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
-                // Deshabilitar CSRF (no es necesario para APIs stateless)
                 .csrf(csrf -> csrf.disable())
-
-                // Configurar política de sesiones (stateless = sin sesiones)
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-
-                // Configurar autorización de requests
                 .authorizeHttpRequests(auth -> auth
-                        // Permitir acceso sin autenticación al endpoint de login
+                        // Permitir login sin autenticación
                         .requestMatchers(HttpMethod.POST, "/login").permitAll()
+
+                        // ============================================
+                        // NUEVO - Permitir registro sin autenticación
+                        // ============================================
+                        .requestMatchers(HttpMethod.POST, "/usuarios").permitAll()
 
                         // Cualquier otra petición requiere autenticación
                         .anyRequest().authenticated()
                 )
-
+                .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 
-    /**
-     * Bean para gestionar la autenticación
-     * Spring Security lo usa para validar credenciales
-     */
     @Bean
     public AuthenticationManager authenticationManager(
             AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
-    /**
-     * Bean para encriptar contraseñas con BCrypt
-     * Spring Security lo usa para comparar passwords
-     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();

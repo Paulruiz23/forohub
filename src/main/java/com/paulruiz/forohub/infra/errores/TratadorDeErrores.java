@@ -31,26 +31,29 @@ public class TratadorDeErrores {
         return ResponseEntity.badRequest().body(errores);
     }
 
-    // ============================================
-    // NUEVO - Manejar errores de autenticación
-    // ============================================
-
-    /**
-     * Maneja errores de credenciales inválidas (email o contraseña incorrectos)
-     */
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<DatosErrorValidacion> tratarErrorBadCredentials() {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(new DatosErrorValidacion("Credenciales inválidas"));
     }
 
-    /**
-     * Maneja otros errores de autenticación
-     */
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<DatosErrorValidacion> tratarErrorAuthentication(AuthenticationException e) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(new DatosErrorValidacion("Error de autenticación: " + e.getMessage()));
+    }
+
+    // ============================================
+    // NUEVO - Manejar email duplicado
+    // ============================================
+
+    /**
+     * Maneja errores cuando se intenta registrar un email duplicado
+     */
+    @ExceptionHandler(EmailDuplicadoException.class)
+    public ResponseEntity<DatosErrorValidacion> tratarErrorEmailDuplicado(EmailDuplicadoException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new DatosErrorValidacion("email", e.getMessage()));
     }
 
     private record DatosErrorValidacion(String campo, String error) {
