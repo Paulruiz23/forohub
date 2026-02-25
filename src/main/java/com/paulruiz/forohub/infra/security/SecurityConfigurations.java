@@ -35,10 +35,13 @@ public class SecurityConfigurations {
                         // Permitir login sin autenticación
                         .requestMatchers(HttpMethod.POST, "/login").permitAll()
 
-                        // ============================================
-                        // NUEVO - Permitir registro sin autenticación
-                        // ============================================
+                        // Permitir registro sin autenticación
                         .requestMatchers(HttpMethod.POST, "/usuarios").permitAll()
+
+                        // ============================================
+                        // Permitir acceso a Swagger sin autenticación
+                        // ============================================
+                        .requestMatchers("/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**").permitAll()
 
                         // Cualquier otra petición requiere autenticación
                         .anyRequest().authenticated()

@@ -13,6 +13,9 @@ import com.paulruiz.forohub.repository.CursoRepository;
 import com.paulruiz.forohub.repository.RespuestaRepository;
 import com.paulruiz.forohub.repository.TopicoRepository;
 import com.paulruiz.forohub.repository.UsuarioRepository;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +32,8 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/topicos")
+@Tag(name = "Tópicos", description = "Operaciones CRUD para gestionar tópicos del foro")
+@SecurityRequirement(name = "bearer-key")
 public class TopicoController {
 
     @Autowired
@@ -40,12 +45,13 @@ public class TopicoController {
     @Autowired
     private CursoRepository cursoRepository;
 
-    // ============================================
-    // POST - Crear tópico (Paso 3)
-    // ============================================
+    @Autowired
+    private RespuestaRepository respuestaRepository;
 
     @PostMapping
     @Transactional
+    @Operation(summary = "Crear un nuevo tópico",
+            description = "Crea un nuevo tópico en el foro. Requiere autenticación JWT.")
     public ResponseEntity<DetalleTopicoDTO> crearTopico(
             @RequestBody @Valid TopicoDTO topicoDTO,
             UriComponentsBuilder uriBuilder) {
@@ -80,11 +86,9 @@ public class TopicoController {
                 .body(new DetalleTopicoDTO(topico));
     }
 
-    // ============================================
-    // GET - Listar todos (Paso 4)
-    // ============================================
-
     @GetMapping
+    @Operation(summary = "Listar todos los tópicos",
+            description = "Retorna una lista paginada de todos los tópicos. Ordenados por fecha de creación descendente.")
     public ResponseEntity<Page<DetalleTopicoDTO>> listarTopicos(
             @PageableDefault(
                     size = 10,
@@ -98,174 +102,30 @@ public class TopicoController {
         return ResponseEntity.ok(topicosDTO);
     }
 
-    // ============================================
-    // GET - Detalle de un tópico específico (NUEVO - Paso 5)
-    // ============================================
-
-    /**
-     * GET /topicos/{id} - Obtener detalle de un tópico específico
-     *
-     * @param id ID del tópico a consultar
-     * @return ResponseEntity con el tópico o 404 si no existe
-     *
-     * Ejemplo en Insomnia:
-     * GET http://localhost:8080/topicos/1
-     */
     @GetMapping("/{id}")
-    public ResponseEntity<DetalleTopicoDTO> detalleTopico(
-            @PathVariable Long id) {
+    @Operation(summary = "Obtener detalle de un tópico",
+            description = "Retorna la información completa de un tópico específico por su ID.")
+    public ResponseEntity<DetalleTopicoDTO> detalleTopico(@PathVariable Long id) {
 
-        // ============================================
-        // 1. Buscar el tópico en la base de datos
-        // ============================================
-        // findById() retorna Optional<Topico>
-        // - Si existe: Optional contiene el tópico
-        // - Si no existe: Optional está vacío
         Topico topico = topicoRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Tópico con ID " + id + " no encontrado"));
 
-        // ============================================
-        // 2. Convertir a DTO
-        // ============================================
-        DetalleTopicoDTO detalleDTO = new DetalleTopicoDTO(topico);
-
-        // ============================================
-        // 3. Retornar respuesta 200 OK
-        // ============================================
-        return ResponseEntity.ok(detalleDTO);
-    }
-
-    // ============================================
-// PUT - Actualizar tópico (NUEVO - Paso 6)
-// ============================================
-
-    /**
-     * PUT /topicos/{id} - Actualizar un tópico existente
-     *
-     * @param id ID del tópico a actualizar
-     * @param actualizarDTO Datos a actualizar
-     * @return ResponseEntity con el tópico actualizado
-     *
-     * Ejemplo en Insomnia:
-     * PUT http://localhost:8080/topicos/1
-     * Body:
-     * {
-     *   "titulo": "¿Cómo configurar Spring Security?",
-     *   "mensaje": "Necesito ayuda urgente con la configuración",
-     *   "cursoId": 1
-     * }
-     */
-    @PutMapping("/{id}")
-    @Transactional
-    public ResponseEntity<DetalleTopicoDTO> actualizarTopico(
-            @PathVariable Long id,
-            @RequestBody @Valid ActualizarTopicoDTO actualizarDTO) {
-
-        // ============================================
-        // 1. Verificar que el tópico existe
-        // ============================================
-        Topico topico = topicoRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(
-                        "Tópico con ID " + id + " no encontrado"));
-
-        // ============================================
-        // 2. VALIDACIÓN: No permitir duplicados
-        // ============================================
-        // Verificar si existe otro tópico con mismo título y mensaje
-        // (excluyendo el tópico actual)
-        if (topicoRepository.existsByTituloAndMensajeAndIdNot(
-                actualizarDTO.titulo(),
-                actualizarDTO.mensaje(),
-                id)) {
-            // Si existe otro tópico duplicado, retornar error 400
-            return ResponseEntity.badRequest().build();
-        }
-
-        // ============================================
-        // 3. VALIDACIÓN: Verificar que el curso existe
-        // ============================================
-        Curso curso = cursoRepository.findById(actualizarDTO.cursoId())
-                .orElseThrow(() -> new EntityNotFoundException(
-                        "Curso con ID " + actualizarDTO.cursoId() + " no encontrado"));
-
-        // ============================================
-        // 4. Actualizar los datos del tópico
-        // ============================================
-        topico.actualizarDatos(actualizarDTO, curso);
-
-        // No es necesario llamar a save() porque @Transactional
-        // guarda automáticamente los cambios al final del método
-
-        // ============================================
-        // 5. Retornar respuesta 200 OK con datos actualizados
-        // ============================================
         return ResponseEntity.ok(new DetalleTopicoDTO(topico));
     }
 
-
-    // ============================================
-    // DELETE - Eliminar tópico (NUEVO - Paso 7)
-    // ============================================
-
-    /**
-     * DELETE /topicos/{id} - Eliminar un tópico específico
-     *
-     * @param id ID del tópico a eliminar
-     * @return ResponseEntity con status 204 No Content
-     *
-     * Ejemplo en Insomnia:
-     * DELETE http://localhost:8080/topicos/1
-     */
-    @DeleteMapping("/{id}")
-    @Transactional
-    public ResponseEntity<Void> eliminarTopico(@PathVariable Long id) {
-
-        // ============================================
-        // 1. Verificar que el tópico existe
-        // ============================================
-        Topico topico = topicoRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(
-                        "Tópico con ID " + id + " no encontrado"));
-
-        // ============================================
-        // 2. Eliminar el tópico de la base de datos
-        // ============================================
-        topicoRepository.delete(topico);
-
-        // Alternativa usando deleteById():
-        // topicoRepository.deleteById(id);
-
-        // ============================================
-        // 3. Retornar respuesta 204 No Content
-        // ============================================
-        // 204 = Operación exitosa, sin contenido en la respuesta
-        return ResponseEntity.noContent().build();
-    }
-
-    @Autowired
-    private RespuestaRepository respuestaRepository;  // Añadir esta inyección arriba
-
-    /**
-     * GET /topicos/{id}/respuestas - Listar respuestas de un tópico
-     *
-     * Ejemplo en Insomnia:
-     * GET http://localhost:8080/topicos/1/respuestas
-     * Authorization: Bearer [TOKEN]
-     */
     @GetMapping("/{id}/respuestas")
+    @Operation(summary = "Listar respuestas de un tópico",
+            description = "Retorna todas las respuestas asociadas a un tópico específico.")
     public ResponseEntity<List<DetalleRespuestaDTO>> listarRespuestasDeTopico(
             @PathVariable Long id) {
 
-        // Verificar que el tópico existe
         topicoRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Tópico con ID " + id + " no encontrado"));
 
-        // Obtener respuestas del tópico
         List<Respuesta> respuestas = respuestaRepository.findByTopicoId(id);
 
-        // Convertir a DTOs
         List<DetalleRespuestaDTO> respuestasDTO = respuestas.stream()
                 .map(DetalleRespuestaDTO::new)
                 .toList();
@@ -273,5 +133,46 @@ public class TopicoController {
         return ResponseEntity.ok(respuestasDTO);
     }
 
+    @PutMapping("/{id}")
+    @Transactional
+    @Operation(summary = "Actualizar un tópico",
+            description = "Actualiza el título, mensaje y/o curso de un tópico existente.")
+    public ResponseEntity<DetalleTopicoDTO> actualizarTopico(
+            @PathVariable Long id,
+            @RequestBody @Valid ActualizarTopicoDTO actualizarDTO) {
 
+        Topico topico = topicoRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Tópico con ID " + id + " no encontrado"));
+
+        if (topicoRepository.existsByTituloAndMensajeAndIdNot(
+                actualizarDTO.titulo(),
+                actualizarDTO.mensaje(),
+                id)) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        Curso curso = cursoRepository.findById(actualizarDTO.cursoId())
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Curso con ID " + actualizarDTO.cursoId() + " no encontrado"));
+
+        topico.actualizarDatos(actualizarDTO, curso);
+
+        return ResponseEntity.ok(new DetalleTopicoDTO(topico));
+    }
+
+    @DeleteMapping("/{id}")
+    @Transactional
+    @Operation(summary = "Eliminar un tópico",
+            description = "Elimina permanentemente un tópico y todas sus respuestas asociadas.")
+    public ResponseEntity<Void> eliminarTopico(@PathVariable Long id) {
+
+        Topico topico = topicoRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Tópico con ID " + id + " no encontrado"));
+
+        topicoRepository.delete(topico);
+
+        return ResponseEntity.noContent().build();
+    }
 }
