@@ -198,4 +198,46 @@ public class TopicoController {
         // ============================================
         return ResponseEntity.ok(new DetalleTopicoDTO(topico));
     }
+
+
+    // ============================================
+    // DELETE - Eliminar tópico (NUEVO - Paso 7)
+    // ============================================
+
+    /**
+     * DELETE /topicos/{id} - Eliminar un tópico específico
+     *
+     * @param id ID del tópico a eliminar
+     * @return ResponseEntity con status 204 No Content
+     *
+     * Ejemplo en Insomnia:
+     * DELETE http://localhost:8080/topicos/1
+     */
+    @DeleteMapping("/{id}")
+    @Transactional
+    public ResponseEntity<Void> eliminarTopico(@PathVariable Long id) {
+
+        // ============================================
+        // 1. Verificar que el tópico existe
+        // ============================================
+        Topico topico = topicoRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Tópico con ID " + id + " no encontrado"));
+
+        // ============================================
+        // 2. Eliminar el tópico de la base de datos
+        // ============================================
+        topicoRepository.delete(topico);
+
+        // Alternativa usando deleteById():
+        // topicoRepository.deleteById(id);
+
+        // ============================================
+        // 3. Retornar respuesta 204 No Content
+        // ============================================
+        // 204 = Operación exitosa, sin contenido en la respuesta
+        return ResponseEntity.noContent().build();
+    }
+
+
 }
