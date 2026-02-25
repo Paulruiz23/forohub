@@ -72,4 +72,20 @@ public class Topico {
             this.curso = curso;
         }
     }
+
+    /**
+     * Actualiza el status del tópico según las respuestas
+     * - NO_RESPONDIDO: Sin respuestas
+     * - NO_SOLUCIONADO: Con respuestas pero sin solución
+     * - SOLUCIONADO: Con respuesta marcada como solución
+     */
+    public void actualizarStatus(boolean tieneRespuestas, boolean tieneSolucion) {
+        if (tieneSolucion) {
+            this.status = StatusTopico.SOLUCIONADO;
+        } else if (tieneRespuestas) {
+            this.status = StatusTopico.NO_SOLUCIONADO;
+        } else {
+            this.status = StatusTopico.NO_RESPONDIDO;
+        }
+    }
 }

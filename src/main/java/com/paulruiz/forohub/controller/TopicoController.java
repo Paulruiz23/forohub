@@ -1,13 +1,16 @@
 package com.paulruiz.forohub.controller;
 
 import com.paulruiz.forohub.dto.ActualizarTopicoDTO;
+import com.paulruiz.forohub.dto.DetalleRespuestaDTO;
 import com.paulruiz.forohub.dto.DetalleTopicoDTO;
 import com.paulruiz.forohub.dto.TopicoDTO;
 import com.paulruiz.forohub.infra.errores.EntityNotFoundException;
 import com.paulruiz.forohub.model.Curso;
+import com.paulruiz.forohub.model.Respuesta;
 import com.paulruiz.forohub.model.Topico;
 import com.paulruiz.forohub.model.Usuario;
 import com.paulruiz.forohub.repository.CursoRepository;
+import com.paulruiz.forohub.repository.RespuestaRepository;
 import com.paulruiz.forohub.repository.TopicoRepository;
 import com.paulruiz.forohub.repository.UsuarioRepository;
 import jakarta.transaction.Transactional;
@@ -22,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequestMapping("/topicos")
@@ -237,6 +241,36 @@ public class TopicoController {
         // ============================================
         // 204 = Operación exitosa, sin contenido en la respuesta
         return ResponseEntity.noContent().build();
+    }
+
+    @Autowired
+    private RespuestaRepository respuestaRepository;  // Añadir esta inyección arriba
+
+    /**
+     * GET /topicos/{id}/respuestas - Listar respuestas de un tópico
+     *
+     * Ejemplo en Insomnia:
+     * GET http://localhost:8080/topicos/1/respuestas
+     * Authorization: Bearer [TOKEN]
+     */
+    @GetMapping("/{id}/respuestas")
+    public ResponseEntity<List<DetalleRespuestaDTO>> listarRespuestasDeTopico(
+            @PathVariable Long id) {
+
+        // Verificar que el tópico existe
+        topicoRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Tópico con ID " + id + " no encontrado"));
+
+        // Obtener respuestas del tópico
+        List<Respuesta> respuestas = respuestaRepository.findByTopicoId(id);
+
+        // Convertir a DTOs
+        List<DetalleRespuestaDTO> respuestasDTO = respuestas.stream()
+                .map(DetalleRespuestaDTO::new)
+                .toList();
+
+        return ResponseEntity.ok(respuestasDTO);
     }
 
 
