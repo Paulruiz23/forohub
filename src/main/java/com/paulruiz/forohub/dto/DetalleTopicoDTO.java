@@ -5,9 +5,9 @@ import com.paulruiz.forohub.model.Topico;
 
 import java.time.LocalDateTime;
 
-/**
- * DTO para RETORNAR datos de un tópico
- * Se usa en las respuestas de la API
+/*
+ DTO para RETORNAR datos de un tópico
+ Se usa en las respuestas de la API
  */
 public record DetalleTopicoDTO(
         Long id,
@@ -20,9 +20,10 @@ public record DetalleTopicoDTO(
         String nombreCurso,
         String categoriaCurso
 ) {
-    /**
-     * Constructor que convierte una entidad Topico en DTO
-     * @param topico Entidad Topico de la base de datos
+    /*
+     Constructor que convierte una entidad Topico en DTO
+
+     @param topico Entidad Topico de la base de datos
      */
     public DetalleTopicoDTO(Topico topico) {
         this(

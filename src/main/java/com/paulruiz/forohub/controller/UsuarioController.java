@@ -23,9 +23,6 @@ import java.net.URI;
 import java.util.HashSet;
 import java.util.Set;
 
-/**
- * Controlador para gestionar usuarios
- */
 @RestController
 @RequestMapping("/usuarios")
 @Tag(name = "Usuarios", description = "Operaciones para gestionar usuarios del foro")
@@ -40,9 +37,6 @@ public class UsuarioController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    /**
-     * POST /usuarios - Registrar un nuevo usuario
-     */
     @PostMapping
     @Transactional
     @Operation(
@@ -54,23 +48,19 @@ public class UsuarioController {
             @RequestBody @Valid RegistroUsuarioDTO registroDTO,
             UriComponentsBuilder uriBuilder) {
 
-        // Validar que el email no exista
         if (usuarioRepository.existsByEmail(registroDTO.email())) {
             throw new EmailDuplicadoException("El email ya está registrado");
         }
 
-        // Crear el usuario
         Usuario usuario = new Usuario();
         usuario.setNombre(registroDTO.nombre());
         usuario.setEmail(registroDTO.email());
 
-        // Encriptar la contraseña con BCrypt
         String contrasenaEncriptada = passwordEncoder.encode(registroDTO.contrasena());
         usuario.setContrasena(contrasenaEncriptada);
 
         usuario.setActivo(true);
 
-        // Asignar el perfil USER por defecto
         Perfil perfilUser = perfilRepository.findByNombre("ROLE_USER")
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Perfil ROLE_USER no encontrado"));
@@ -79,10 +69,8 @@ public class UsuarioController {
         perfiles.add(perfilUser);
         usuario.setPerfiles(perfiles);
 
-        // Guardar en la base de datos
         usuarioRepository.save(usuario);
 
-        // Construir URI del recurso creado
         URI url = uriBuilder.path("/usuarios/{id}")
                 .buildAndExpand(usuario.getId())
                 .toUri();
@@ -91,9 +79,6 @@ public class UsuarioController {
                 .body(new DetalleUsuarioDTO(usuario));
     }
 
-    /**
-     * GET /usuarios/{id} - Obtener detalle de un usuario
-     */
     @GetMapping("/{id}")
     @SecurityRequirement(name = "bearer-key")
     @Operation(
@@ -106,6 +91,79 @@ public class UsuarioController {
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Usuario con ID " + id + " no encontrado"));
+
+        return ResponseEntity.ok(new DetalleUsuarioDTO(usuario));
+    }
+
+    // ============================================
+    // Bloquear usuario (Soft Delete)
+    // ============================================
+
+    /*  DELETE /usuarios/{id} - Bloquear/Desactivar un usuario
+
+      No elimina el usuario de la base de datos, solo lo marca como inactivo.
+      Un usuario inactivo NO puede hacer login.
+      Los tópicos y respuestas del usuario permanecen en el sistema.
+    */
+
+    @DeleteMapping("/{id}")
+    @Transactional
+    @SecurityRequirement(name = "bearer-key")
+    @Operation(
+            summary = "Bloquear usuario",
+            description = "Desactiva un usuario del sistema. El usuario bloqueado NO puede hacer login. " +
+                    "Sus tópicos y respuestas permanecen visibles pero marcados como de usuario inactivo. " +
+                    "NO elimina al usuario de la base de datos (soft delete). " +
+                    "Requiere autenticación JWT con rol ADMIN."
+    )
+    public ResponseEntity<Void> bloquearUsuario(@PathVariable Long id) {
+
+        // Buscar el usuario
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Usuario con ID " + id + " no encontrado"));
+
+        // Verificar que no esté ya bloqueado
+        if (!usuario.getActivo()) {
+            throw new RuntimeException("El usuario ya está bloqueado");
+        }
+
+        // Marcar como inactivo (bloquear)
+        usuario.setActivo(false);
+
+        // No es necesario save() porque @Transactional guarda automáticamente
+
+        return ResponseEntity.noContent().build();
+    }
+
+    // ============================================
+    // Desbloquear usuario
+    // ============================================
+
+    //PUT /usuarios/{id}/desbloquear - Reactivar un usuario bloqueado
+
+    @PutMapping("/{id}/desbloquear")
+    @Transactional
+    @SecurityRequirement(name = "bearer-key")
+    @Operation(
+            summary = "Desbloquear usuario",
+            description = "Reactiva un usuario previamente bloqueado. El usuario podrá volver a hacer login. " +
+                    "Requiere autenticación JWT con rol ADMIN."
+    )
+    public ResponseEntity<DetalleUsuarioDTO> desbloquearUsuario(@PathVariable Long id) {
+
+        // Buscar el usuario
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Usuario con ID " + id + " no encontrado"));
+
+        // Verificar que esté bloqueado
+        if (usuario.getActivo()) {
+            throw new RuntimeException("El usuario ya está activo");
+        }
+
+        // Marcar como activo (desbloquear)
+        usuario.setActivo(true);
 
         return ResponseEntity.ok(new DetalleUsuarioDTO(usuario));
     }

@@ -12,9 +12,9 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
-/**
- * Servicio para generar y validar tokens JWT
- */
+
+// Servicio para generar y validar tokens JWT
+
 @Service
 public class TokenService {
 
@@ -26,12 +26,13 @@ public class TokenService {
     @Value("${jwt.expiration}")
     private Long expiration;
 
-    /**
-     * Genera un token JWT para un usuario autenticado
-     *
-     * @param usuario Usuario que se autenticó
-     * @return String con el token JWT
+    /*
+     Genera un token JWT para un usuario autenticado
+
+     @param usuario Usuario que se autenticó
+     @return String con el token JWT
      */
+
     public String generarToken(Usuario usuario) {
         try {
             // Crear algoritmo de firma usando la clave secreta
@@ -50,13 +51,14 @@ public class TokenService {
         }
     }
 
-    /**
-     * Valida un token JWT y extrae el subject (email del usuario)
-     *
-     * @param token Token JWT a validar
-     * @return Email del usuario si el token es válido
-     * @throws RuntimeException si el token es inválido o expiró
+    /*
+     Valida un token JWT y extrae el subject (email del usuario)
+
+     @param token Token JWT a validar
+     @return Email del usuario si el token es válido
+     @throws RuntimeException si el token es inválido o expiró
      */
+
     public String getSubject(String token) {
         if (token == null) {
             throw new RuntimeException("Token nulo");
@@ -78,11 +80,11 @@ public class TokenService {
         }
     }
 
-    /**
-     * Genera la fecha de expiración del token
-     * Fecha actual + tiempo de expiración configurado
-     *
-     * @return Instant con la fecha de expiración
+    /*
+     Genera la fecha de expiración del token
+     Fecha actual + tiempo de expiración configurado
+
+     @return Instant con la fecha de expiración
      */
     private Instant generarFechaExpiracion() {
         return LocalDateTime.now()

@@ -6,10 +6,11 @@ import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-/**
- * DTO para retornar datos de un usuario
- * NO incluye la contraseña por seguridad
+/*
+ DTO para retornar datos de un usuario
+ NO incluye la contraseña por seguridad
  */
+
 public record DetalleUsuarioDTO(
         Long id,
         String nombre,
@@ -18,10 +19,11 @@ public record DetalleUsuarioDTO(
         LocalDateTime fechaCreacion,
         Set<String> perfiles
 ) {
-    /**
-     * Constructor que convierte una entidad Usuario en DTO
-     * @param usuario Entidad Usuario de la base de datos
+    /*
+     Constructor que convierte una entidad Usuario en DTO
+     @param usuario Entidad Usuario de la base de datos
      */
+
     public DetalleUsuarioDTO(Usuario usuario) {
         this(
                 usuario.getId(),

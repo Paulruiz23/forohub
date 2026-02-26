@@ -6,16 +6,16 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-/**
- * Repository para operaciones con Perfil
- */
+// Repository para operaciones con Perfil
+
 @Repository
 public interface PerfilRepository extends JpaRepository<Perfil, Long> {
 
-    /**
-     * Busca un perfil por su nombre
-     * @param nombre Nombre del perfil (ej: ROLE_USER)
-     * @return Optional con el perfil si existe
+    /*
+     Busca un perfil por su nombre
+
+     @param nombre Nombre del perfil (ejem: ROLE_USER)
+     @return Optional con el perfil si existe
      */
     Optional<Perfil> findByNombre(String nombre);
 }

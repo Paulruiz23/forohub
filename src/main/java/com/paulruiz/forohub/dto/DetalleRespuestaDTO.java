@@ -4,9 +4,9 @@ import com.paulruiz.forohub.model.Respuesta;
 
 import java.time.LocalDateTime;
 
-/**
- * DTO para retornar datos de una respuesta
- */
+
+ //DTO para retornar datos de una respuesta
+
 public record DetalleRespuestaDTO(
         Long id,
         String mensaje,
@@ -17,9 +17,10 @@ public record DetalleRespuestaDTO(
         String nombreAutor,
         String emailAutor
 ) {
-    /**
-     * Constructor que convierte una entidad Respuesta en DTO
-     * @param respuesta Entidad Respuesta de la base de datos
+    /*
+     Constructor que convierte una entidad Respuesta en DTO
+
+     @param respuesta Entidad Respuesta de la base de datos
      */
     public DetalleRespuestaDTO(Respuesta respuesta) {
         this(

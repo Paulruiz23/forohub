@@ -3,9 +3,11 @@ package com.paulruiz.forohub.model;
 import jakarta.persistence.*;
 import lombok.*;
 
-/**
- * Entidad que representa un curso/categoría del foro
- */
+/*
+ Entidad que representa un curso/categoría del foro
+ Un tópico pertenece a un curso (ejem: Spring Boot, React, MySQL)
+*/
+
 @Entity
 @Table(name = "cursos")
 @Getter

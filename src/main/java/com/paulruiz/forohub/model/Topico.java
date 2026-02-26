@@ -5,6 +5,13 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
 
+/*
+ Entidad que representa un tópico/pregunta del foro
+ Relaciones:
+ - ManyToOne con Usuario (autor del tópico)
+ - ManyToOne con Curso (curso al que pertenece)
+ */
+
 @Entity
 @Table(name = "topicos")
 @Getter
@@ -27,17 +34,29 @@ public class Topico {
     @Column(name = "fecha_creacion", nullable = false)
     private LocalDateTime fechaCreacion;
 
+    // Status del tópico: NO_RESPONDIDO, NO_SOLUCIONADO, SOLUCIONADO, CERRADO
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 50)
     private StatusTopico status;
 
+    // Relación: Un tópico tiene un autor
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "autor_id", nullable = false)
     private Usuario autor;
 
+    // Relación: Un tópico pertenece a un curso
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "curso_id", nullable = false)
     private Curso curso;
+
+    // ============================================
+    // Asignar valores por defecto antes de guardar
+    // ============================================
+
+    /*
+     Método ejecutado antes de persistir
+     Asigna fecha de creación y status NO_RESPONDIDO por defecto
+     */
 
     @PrePersist
     public void prePersist() {
@@ -50,18 +69,18 @@ public class Topico {
     }
 
     // ============================================
-    // MÉTODO NUEVO - Para actualizar datos
+    // Actualizar datos del tópico
     // ============================================
 
-    /**
-     * Actualiza los datos del tópico
-     * Solo actualiza los campos que no sean null
-     *
-     * @param datos DTO con los nuevos datos
-     * @param curso Nuevo curso (si se cambió)
+    /*
+     Actualiza título, mensaje y/o curso
+     Solo modifica campos que no sean null
+
+     @param datos DTO con los nuevos datos
+     @param curso Nuevo curso (si cambió)
      */
+
     public void actualizarDatos(ActualizarTopicoDTO datos, Curso curso) {
-        // Actualizar solo si se enviaron nuevos datos
         if (datos.titulo() != null) {
             this.titulo = datos.titulo();
         }
@@ -73,12 +92,20 @@ public class Topico {
         }
     }
 
-    /**
-     * Actualiza el status del tópico según las respuestas
-     * - NO_RESPONDIDO: Sin respuestas
-     * - NO_SOLUCIONADO: Con respuestas pero sin solución
-     * - SOLUCIONADO: Con respuesta marcada como solución
+    // ============================================
+    // Actualizar status según respuestas
+    // ============================================
+
+    /*
+     Actualiza el status automáticamente según respuestas:
+     - NO_RESPONDIDO: Sin respuestas
+     - NO_SOLUCIONADO: Con respuestas pero sin solución
+     - SOLUCIONADO: Con respuesta marcada como solución
+
+     @param tieneRespuestas Si el tópico tiene respuestas
+     @param tieneSolucion Si hay una respuesta marcada como solución
      */
+
     public void actualizarStatus(boolean tieneRespuestas, boolean tieneSolucion) {
         if (tieneSolucion) {
             this.status = StatusTopico.SOLUCIONADO;

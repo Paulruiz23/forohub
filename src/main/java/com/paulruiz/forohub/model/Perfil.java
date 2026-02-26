@@ -3,10 +3,11 @@ package com.paulruiz.forohub.model;
 import jakarta.persistence.*;
 import lombok.*;
 
-/**
- * Entidad que representa un rol/perfil de usuario
- * Ejemplos: ROLE_USER, ROLE_ADMIN, ROLE_MODERADOR
- */
+/*
+ Entidad que representa un rol/perfil de usuario
+ Ejemplos: ROLE_USER, ROLE_ADMIN, ROLE_MODERADOR
+*/
+
 @Entity
 @Table(name = "perfiles")
 @Getter

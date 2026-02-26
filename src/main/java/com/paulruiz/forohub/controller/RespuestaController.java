@@ -22,9 +22,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 
-/**
- * Controlador para gestionar respuestas a tópicos
- */
+// Controlador para gestionar respuestas a tópicos
+
 @RestController
 @RequestMapping("/respuestas")
 @Tag(name = "Respuestas", description = "Operaciones CRUD para gestionar respuestas a tópicos del foro")
@@ -39,10 +38,18 @@ public class RespuestaController {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
+// ============================================
+// Crear respuesta
+// ============================================
 
-    /**
-     * POST /respuestas - Crear una respuesta a un tópico
-     */
+/*
+   POST /respuestas - Crear una respuesta a un tópico
+
+   Crea una nueva respuesta asociada a un tópico existente.
+   Valida que el tópico y el autor existan.
+   Actualiza automáticamente el status del tópico a NO_SOLUCIONADO.
+*/
+
     @PostMapping
     @Transactional
     @Operation(
@@ -55,30 +62,24 @@ public class RespuestaController {
             @RequestBody @Valid RespuestaDTO respuestaDTO,
             UriComponentsBuilder uriBuilder) {
 
-        // Verificar que el tópico existe
         Topico topico = topicoRepository.findById(respuestaDTO.topicoId())
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Tópico con ID " + respuestaDTO.topicoId() + " no encontrado"));
 
-        // Verificar que el autor existe
         Usuario autor = usuarioRepository.findById(respuestaDTO.autorId())
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Usuario con ID " + respuestaDTO.autorId() + " no encontrado"));
 
-        // Crear la respuesta
         Respuesta respuesta = new Respuesta();
         respuesta.setMensaje(respuestaDTO.mensaje());
         respuesta.setTopico(topico);
         respuesta.setAutor(autor);
         respuesta.setSolucion(false);
 
-        // Guardar en la base de datos
         respuestaRepository.save(respuesta);
 
-        // Actualizar el status del tópico a NO_SOLUCIONADO
         topico.actualizarStatus(true, false);
 
-        // Construir URI del recurso creado
         URI url = uriBuilder.path("/respuestas/{id}")
                 .buildAndExpand(respuesta.getId())
                 .toUri();
@@ -87,14 +88,21 @@ public class RespuestaController {
                 .body(new DetalleRespuestaDTO(respuesta));
     }
 
-    /**
-     * GET /respuestas/{id} - Obtener detalle de una respuesta
-     */
+
+    // ============================================
+    // Detalle de respuesta
+    // ============================================
+
+/*
+   GET /respuestas/{id}
+
+   Retorna la información completa de una respuesta específica.
+*/
+
     @GetMapping("/{id}")
     @Operation(
             summary = "Obtener detalle de una respuesta",
-            description = "Retorna la información completa de una respuesta específica por su ID, " +
-                    "incluyendo el tópico al que pertenece y el autor. Requiere autenticación JWT."
+            description = "Retorna la información completa de una respuesta específica por su ID."
     )
     public ResponseEntity<DetalleRespuestaDTO> detalleRespuesta(@PathVariable Long id) {
 
@@ -105,15 +113,22 @@ public class RespuestaController {
         return ResponseEntity.ok(new DetalleRespuestaDTO(respuesta));
     }
 
-    /**
-     * PUT /respuestas/{id} - Actualizar una respuesta
-     */
+
+    // ============================================
+    // Actualizar respuesta
+    // ============================================
+
+/*
+   PUT /respuestas/{id}
+
+   Permite modificar únicamente el mensaje de la respuesta.
+*/
+
     @PutMapping("/{id}")
     @Transactional
     @Operation(
             summary = "Actualizar una respuesta",
-            description = "Actualiza el mensaje de una respuesta existente. " +
-                    "No se puede cambiar el tópico o autor de la respuesta. Requiere autenticación JWT."
+            description = "Actualiza el mensaje de una respuesta existente. No se puede cambiar el tópico ni el autor."
     )
     public ResponseEntity<DetalleRespuestaDTO> actualizarRespuesta(
             @PathVariable Long id,
@@ -123,22 +138,28 @@ public class RespuestaController {
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Respuesta con ID " + id + " no encontrada"));
 
-        // Actualizar el mensaje
         respuesta.setMensaje(actualizarDTO.mensaje());
 
         return ResponseEntity.ok(new DetalleRespuestaDTO(respuesta));
     }
 
-    /**
-     * DELETE /respuestas/{id} - Eliminar una respuesta
-     */
+
+    // ============================================
+    // Eliminar respuesta
+    // ============================================
+
+/*
+   DELETE /respuestas/{id}
+
+   Elimina permanentemente una respuesta.
+   Recalcula el status del tópico automáticamente.
+*/
+
     @DeleteMapping("/{id}")
     @Transactional
     @Operation(
             summary = "Eliminar una respuesta",
-            description = "Elimina permanentemente una respuesta del sistema. " +
-                    "Actualiza automáticamente el status del tópico según las respuestas restantes. " +
-                    "Requiere autenticación JWT."
+            description = "Elimina permanentemente una respuesta y actualiza el status del tópico."
     )
     public ResponseEntity<Void> eliminarRespuesta(@PathVariable Long id) {
 
@@ -148,10 +169,8 @@ public class RespuestaController {
 
         Topico topico = respuesta.getTopico();
 
-        // Eliminar la respuesta
         respuestaRepository.delete(respuesta);
 
-        // Actualizar el status del tópico
         Long cantidadRespuestas = respuestaRepository.countByTopicoId(topico.getId());
         boolean tieneSolucion = respuestaRepository.existeSolucionEnTopico(topico.getId());
 
@@ -160,17 +179,23 @@ public class RespuestaController {
         return ResponseEntity.noContent().build();
     }
 
-    /**
-     * PUT /respuestas/{id}/marcar-solucion - Marcar respuesta como solución
-     */
+
+    // ============================================
+    // Marcar respuesta como solución
+    // ============================================
+
+/*
+   PUT /respuestas/{id}/marcar-solucion
+
+   Marca una respuesta como la solución aceptada.
+   Solo puede existir una solución por tópico.
+*/
+
     @PutMapping("/{id}/marcar-solucion")
     @Transactional
     @Operation(
             summary = "Marcar respuesta como solución",
-            description = "Marca una respuesta como la solución aceptada del tópico. " +
-                    "Solo puede haber una solución por tópico. " +
-                    "Actualiza automáticamente el status del tópico a SOLUCIONADO. " +
-                    "Requiere autenticación JWT."
+            description = "Marca una respuesta como la solución aceptada del tópico y actualiza su status a SOLUCIONADO."
     )
     public ResponseEntity<DetalleRespuestaDTO> marcarComoSolucion(@PathVariable Long id) {
 
@@ -178,17 +203,15 @@ public class RespuestaController {
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Respuesta con ID " + id + " no encontrada"));
 
-        // Verificar si ya hay una solución en este tópico
         if (respuestaRepository.existeSolucionEnTopico(respuesta.getTopico().getId())) {
             throw new RuntimeException("Este tópico ya tiene una respuesta marcada como solución");
         }
 
-        // Marcar como solución
         respuesta.setSolucion(true);
 
-        // Actualizar status del tópico a SOLUCIONADO
         respuesta.getTopico().actualizarStatus(true, true);
 
         return ResponseEntity.ok(new DetalleRespuestaDTO(respuesta));
     }
+
 }

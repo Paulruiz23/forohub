@@ -12,10 +12,11 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-/**
- * Entidad que representa un usuario del sistema
- * Implementa UserDetails de Spring Security para autenticación
+/*
+ Entidad que representa un usuario del sistema
+ Implementa UserDetails de Spring Security para autenticación
  */
+
 @Entity
 @Table(name = "usuarios")
 @Getter
@@ -64,10 +65,11 @@ public class Usuario implements UserDetails {
     // MÉTODOS DE UserDetails (Spring Security)
     // ============================================
 
-    /**
-     * Retorna los roles/permisos del usuario
-     * Spring Security usa esto para autorización
+    /*
+     Retorna los roles/permisos del usuario
+     Spring Security usa esto para autorización
      */
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return perfiles.stream()

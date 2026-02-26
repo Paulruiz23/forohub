@@ -14,10 +14,12 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
     // NUEVO - Para validar email duplicado
     // ============================================
 
-    /**
-     * Verifica si ya existe un usuario con el email dado
-     * @param email Email a verificar
-     * @return true si existe, false si no
+    /*
+     Verifica si ya existe un usuario con el email dado
+
+     @param email Email a verificar
+     @return true si existe, false si no
      */
+
     boolean existsByEmail(String email);
 }

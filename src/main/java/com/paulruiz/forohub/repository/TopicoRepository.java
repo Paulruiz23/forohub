@@ -22,43 +22,40 @@ public interface TopicoRepository extends JpaRepository<Topico, Long> {
     // NUEVO - Para validar duplicados al actualizar
     // ============================================
 
-    /**
-     * Verifica si existe otro tópico con el mismo título y mensaje
-     * excluyendo el tópico que se está actualizando
-     *
-     * @param titulo Título del tópico
-     * @param mensaje Mensaje del tópico
-     * @param id ID del tópico que se está actualizando (para excluirlo)
-     * @return true si existe otro tópico duplicado
+    /*
+     Verifica si existe otro tópico con el mismo título y mensaje
+     excluyendo el tópico que se está actualizando
+
+     @param titulo Título del tópico
+     @param mensaje Mensaje del tópico
+     @param id ID del tópico que se está actualizando (para excluirlo)
+     @return true si existe otro tópico duplicado
      */
+
     boolean existsByTituloAndMensajeAndIdNot(String titulo, String mensaje, Long id);
 
     Page<Topico> findByCursoNombreContainingIgnoreCase(
             String nombreCurso,
             Pageable paginacion);
 
-    /**
-     * Buscar tópicos por año de creación
-     * Ejemplo: /topicos/buscar?anio=2024
-     *
-     * @param anio Año de creación
-     * @param paginacion Configuración de paginación
-     * @return Página de tópicos del año especificado
+    /*
+     @param anio Año de creación
+     @param paginacion Configuración de paginación
+     @return Página de tópicos del año especificado
      */
+
     @Query("SELECT t FROM Topico t WHERE YEAR(t.fechaCreacion) = :anio")
     Page<Topico> findByAnio(
             @Param("anio") Integer anio,
             Pageable paginacion);
 
-    /**
-     * Buscar tópicos por curso Y año
-     * Ejemplo: /topicos/buscar?curso=Spring Boot&anio=2024
-     *
-     * @param nombreCurso Nombre del curso
-     * @param anio Año de creación
-     * @param paginacion Configuración de paginación
-     * @return Página de tópicos filtrados
+    /*
+     @param nombreCurso Nombre del curso
+     @param anio Año de creación
+     @param paginacion Configuración de paginación
+     @return Página de tópicos filtrados
      */
+
     @Query("SELECT t FROM Topico t " +
             "WHERE LOWER(t.curso.nombre) LIKE LOWER(CONCAT('%', :nombreCurso, '%')) " +
             "AND YEAR(t.fechaCreacion) = :anio")

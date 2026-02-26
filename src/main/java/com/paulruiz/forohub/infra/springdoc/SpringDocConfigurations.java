@@ -9,9 +9,9 @@ import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-/**
- * Configuración de SpringDoc OpenAPI (Swagger)
- * para documentación automática de la API
+/*
+ Configuración de SpringDoc OpenAPI (Swagger)
+ para documentación automática de la API
  */
 @Configuration
 public class SpringDocConfigurations {

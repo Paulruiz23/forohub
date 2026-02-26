@@ -3,9 +3,9 @@ package com.paulruiz.forohub.dto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
-/**
- * DTO para crear una respuesta a un tópico
- */
+
+ //DTO para crear una respuesta a un tópico
+
 public record RespuestaDTO(
 
         @NotBlank(message = "El mensaje es obligatorio")

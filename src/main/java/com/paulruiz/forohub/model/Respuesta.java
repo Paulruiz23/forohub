@@ -4,12 +4,13 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
 
-/**
- * Entidad que representa una respuesta a un tópico
- * Relaciones:
- * - ManyToOne con Topico
- * - ManyToOne con Usuario (autor)
+/*
+ Entidad que representa una respuesta a un tópico
+ Relaciones:
+ - ManyToOne con Topico
+ - ManyToOne con Usuario (autor)
  */
+
 @Entity
 @Table(name = "respuestas")
 @Getter
@@ -42,9 +43,8 @@ public class Respuesta {
     @JoinColumn(name = "autor_id", nullable = false)
     private Usuario autor;
 
-    /**
-     * Método ejecutado automáticamente antes de persistir
-     */
+    // Método ejecutado automáticamente antes de persistir
+
     @PrePersist
     public void prePersist() {
         if (fechaCreacion == null) {

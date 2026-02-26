@@ -4,9 +4,9 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
-/**
- * DTO para registrar un nuevo usuario
- */
+
+ //DTO para registrar un nuevo usuario
+
 public record RegistroUsuarioDTO(
 
         @NotBlank(message = "El nombre es obligatorio")
