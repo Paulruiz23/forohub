@@ -1,8 +1,8 @@
 package com.paulruiz.forohub.infra.errores;
 
-/**
- * Excepción lanzada cuando no se encuentra un tópico en la base de datos
- */
+
+// Excepción lanzada cuando no se encuentra un tópico en la base de datos
+
 public class TopicoNotFoundException extends RuntimeException {
 
     public TopicoNotFoundException(String mensaje) {

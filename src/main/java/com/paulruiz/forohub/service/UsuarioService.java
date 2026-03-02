@@ -18,9 +18,8 @@ import org.springframework.stereotype.Service;
 import java.util.HashSet;
 import java.util.Set;
 
-/**
- * Servicio que contiene la lógica de negocio para Usuarios
- */
+// Servicio que contiene la lógica de negocio para Usuarios
+
 @Service
 public class UsuarioService {
 
@@ -37,14 +36,14 @@ public class UsuarioService {
     // Registrar usuario
     // ============================================
 
-    /**
-     * Registra un nuevo usuario en el sistema
-     * Encripta la contraseña y asigna rol USER por defecto
-     *
-     * @param registroDTO Datos del usuario
-     * @return Usuario creado
-     * @throws EmailDuplicadoException si el email ya existe
-     * @throws PerfilNotFoundException si no existe el rol USER
+    /*
+      Registra un nuevo usuario en el sistema
+      Encripta la contraseña y asigna rol USER por defecto
+
+      @param registroDTO Datos del usuario
+      @return Usuario creado
+      @throws EmailDuplicadoException si el email ya existe
+      @throws PerfilNotFoundException si no existe el rol USER
      */
     @Transactional
     public Usuario registrarUsuario(RegistroUsuarioDTO registroDTO) {
@@ -82,12 +81,12 @@ public class UsuarioService {
     // Obtener usuario por ID
     // ============================================
 
-    /**
-     * Busca un usuario por su ID
-     *
-     * @param id ID del usuario
-     * @return Usuario encontrado
-     * @throws UsuarioNotFoundException si no existe
+    /*
+      Busca un usuario por su ID
+
+      @param id ID del usuario
+      @return Usuario encontrado
+      @throws UsuarioNotFoundException si no existe
      */
     public Usuario obtenerUsuarioPorId(Long id) {
         return usuarioRepository.findById(id)
@@ -98,13 +97,13 @@ public class UsuarioService {
     // Bloquear usuario
     // ============================================
 
-    /**
-     * Bloquea un usuario (soft delete)
-     * El usuario no puede hacer login pero sus datos permanecen
-     *
-     * @param id ID del usuario a bloquear
-     * @throws UsuarioNotFoundException si no existe
-     * @throws UsuarioBloqueadoException si ya está bloqueado
+    /*
+      Bloquea un usuario (soft delete)
+      El usuario no puede hacer login pero sus datos permanecen
+
+      @param id ID del usuario a bloquear
+      @throws UsuarioNotFoundException si no existe
+      @throws UsuarioBloqueadoException si ya está bloqueado
      */
     @Transactional
     public void bloquearUsuario(Long id) {
@@ -123,13 +122,13 @@ public class UsuarioService {
     // Desbloquear usuario
     // ============================================
 
-    /**
-     * Desbloquea un usuario previamente bloqueado
-     *
-     * @param id ID del usuario a desbloquear
-     * @return Usuario desbloqueado
-     * @throws UsuarioNotFoundException si no existe
-     * @throws UsuarioActivoException si ya está activo
+    /*
+      Desbloquea un usuario previamente bloqueado
+
+      @param id ID del usuario a desbloquear
+      @return Usuario desbloqueado
+      @throws UsuarioNotFoundException si no existe
+      @throws UsuarioActivoException si ya está activo
      */
     @Transactional
     public Usuario desbloquearUsuario(Long id) {

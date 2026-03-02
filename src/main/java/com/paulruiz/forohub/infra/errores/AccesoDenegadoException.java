@@ -1,8 +1,8 @@
 package com.paulruiz.forohub.infra.errores;
 
-/**
- * Excepción lanzada cuando un usuario intenta acceder a un recurso
- * que no le pertenece y no tiene permisos de ADMIN
+/*
+  Excepción lanzada cuando un usuario intenta acceder a un recurso
+  que no le pertenece y no tiene permisos de ADMIN
  */
 public class AccesoDenegadoException extends RuntimeException {
 

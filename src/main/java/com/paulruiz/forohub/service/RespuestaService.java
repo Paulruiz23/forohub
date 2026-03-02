@@ -18,9 +18,8 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * Servicio que contiene la lógica de negocio para Respuestas
- */
+// Servicio que contiene la lógica de negocio para Respuestas
+
 @Service
 public class RespuestaService {
 
@@ -37,14 +36,14 @@ public class RespuestaService {
     // Crear respuesta
     // ============================================
 
-    /**
-     * Crea una nueva respuesta a un tópico
-     * El autor se obtiene automáticamente del usuario autenticado (JWT)
-     * Actualiza automáticamente el status del tópico a NO_SOLUCIONADO
-     *
-     * @param respuestaDTO Datos de la respuesta
-     * @return Respuesta creada
-     * @throws TopicoNotFoundException si el tópico no existe
+    /*
+      Crea una nueva respuesta a un tópico
+      El autor se obtiene automáticamente del usuario autenticado (JWT)
+      Actualiza automáticamente el status del tópico a NO_SOLUCIONADO
+
+      @param respuestaDTO Datos de la respuesta
+      @return Respuesta creada
+      @throws TopicoNotFoundException si el tópico no existe
      */
     @Transactional
     public Respuesta crearRespuesta(RespuestaDTO respuestaDTO) {
@@ -74,11 +73,11 @@ public class RespuestaService {
     // Listar respuestas de un tópico
     // ============================================
 
-    /**
-     * Lista todas las respuestas de un tópico
-     *
-     * @param topicoId ID del tópico
-     * @return Lista de respuestas en DTO
+    /*
+      Lista todas las respuestas de un tópico
+
+      @param topicoId ID del tópico
+      @return Lista de respuestas en DTO
      */
     public List<DetalleRespuestaDTO> listarRespuestasDeTopico(Long topicoId) {
         List<Respuesta> respuestas = respuestaRepository.findByTopicoId(topicoId);
@@ -92,12 +91,12 @@ public class RespuestaService {
     // Obtener respuesta por ID
     // ============================================
 
-    /**
-     * Busca una respuesta por su ID
-     *
-     * @param id ID de la respuesta
-     * @return Respuesta encontrada
-     * @throws RespuestaNotFoundException si no existe
+    /*
+      Busca una respuesta por su ID
+
+      @param id ID de la respuesta
+      @return Respuesta encontrada
+      @throws RespuestaNotFoundException si no existe
      */
     public Respuesta obtenerRespuestaPorId(Long id) {
         return respuestaRepository.findById(id)
@@ -108,15 +107,15 @@ public class RespuestaService {
     // Actualizar respuesta
     // ============================================
 
-    /**
-     * Actualiza el mensaje de una respuesta
-     * SOLO el autor de la respuesta o un ADMIN puede actualizarla
-     *
-     * @param id ID de la respuesta
-     * @param actualizarDTO Nuevo mensaje
-     * @return Respuesta actualizada
-     * @throws RespuestaNotFoundException si no existe
-     * @throws AccesoDenegadoException si no tiene permisos
+    /*
+      Actualiza el mensaje de una respuesta
+      SOLO el autor de la respuesta o un ADMIN puede actualizarla
+
+      @param id ID de la respuesta
+      @param actualizarDTO Nuevo mensaje
+      @return Respuesta actualizada
+      @throws RespuestaNotFoundException si no existe
+      @throws AccesoDenegadoException si no tiene permisos
      */
     @Transactional
     public Respuesta actualizarRespuesta(Long id, ActualizarRespuestaDTO actualizarDTO) {
@@ -133,14 +132,14 @@ public class RespuestaService {
     // Eliminar respuesta
     // ============================================
 
-    /**
-     * Elimina una respuesta permanentemente
-     * SOLO el autor de la respuesta o un ADMIN puede eliminarla
-     * Actualiza el status del tópico según las respuestas restantes
-     *
-     * @param id ID de la respuesta a eliminar
-     * @throws RespuestaNotFoundException si no existe
-     * @throws AccesoDenegadoException si no tiene permisos
+    /*
+      Elimina una respuesta permanentemente
+      SOLO el autor de la respuesta o un ADMIN puede eliminarla
+      Actualiza el status del tópico según las respuestas restantes
+
+      @param id ID de la respuesta a eliminar
+      @throws RespuestaNotFoundException si no existe
+      @throws AccesoDenegadoException si no tiene permisos
      */
     @Transactional
     public void eliminarRespuesta(Long id) {
@@ -165,16 +164,16 @@ public class RespuestaService {
     // Marcar respuesta como solución
     // ============================================
 
-    /**
-     * Marca una respuesta como solución del tópico
-     * SOLO el autor del tópico (quien hizo la pregunta) o un ADMIN puede marcar la solución
-     * Solo puede haber una solución por tópico
-     *
-     * @param id ID de la respuesta
-     * @return Respuesta marcada como solución
-     * @throws RespuestaNotFoundException si no existe
-     * @throws SolucionDuplicadaException si ya hay una solución
-     * @throws AccesoDenegadoException si no tiene permisos
+    /*
+      Marca una respuesta como solución del tópico
+      SOLO el autor del tópico (quien hizo la pregunta) o un ADMIN puede marcar la solución
+      Solo puede haber una solución por tópico
+
+      @param id ID de la respuesta
+      @return Respuesta marcada como solución
+      @throws RespuestaNotFoundException si no existe
+      @throws SolucionDuplicadaException si ya hay una solución
+      @throws AccesoDenegadoException si no tiene permisos
      */
     @Transactional
     public Respuesta marcarComoSolucion(Long id) {
@@ -201,11 +200,9 @@ public class RespuestaService {
     // Métodos privados
     // ============================================
 
-    /**
-     * Busca un tópico por ID
-     *
-     * @throws TopicoNotFoundException si no existe
-     */
+    // Busca un tópico por ID
+    // @throws TopicoNotFoundException si no existe
+
     private Topico buscarTopico(Long id) {
         return topicoRepository.findById(id)
                 .orElseThrow(() -> new TopicoNotFoundException(id));

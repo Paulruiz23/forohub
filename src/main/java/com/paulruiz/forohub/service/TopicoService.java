@@ -16,9 +16,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-/**
- * Servicio que contiene la lógica de negocio para Tópicos
- */
+// Servicio que contiene la lógica de negocio para Tópicos
+
 @Service
 public class TopicoService {
 
@@ -35,15 +34,15 @@ public class TopicoService {
     // Crear tópico
     // ============================================
 
-    /**
-     * Crea un nuevo tópico en el sistema
-     * El autor se obtiene automáticamente del usuario autenticado (JWT)
-     * Valida que no exista duplicado (mismo título y mensaje)
-     *
-     * @param topicoDTO Datos del tópico a crear
-     * @return Tópico creado
-     * @throws TopicoDuplicadoException si el tópico está duplicado
-     * @throws CursoNotFoundException si el curso no existe
+    /*
+      Crea un nuevo tópico en el sistema
+      El autor se obtiene automáticamente del usuario autenticado (JWT)
+      Valida que no exista duplicado (mismo título y mensaje)
+
+      @param topicoDTO Datos del tópico a crear
+      @return Tópico creado
+      @throws TopicoDuplicadoException si el tópico está duplicado
+      @throws CursoNotFoundException si el curso no existe
      */
     @Transactional
     public Topico crearTopico(TopicoDTO topicoDTO) {
@@ -71,11 +70,11 @@ public class TopicoService {
     // Listar tópicos
     // ============================================
 
-    /**
-     * Lista todos los tópicos con paginación
-     *
-     * @param paginacion Configuración de paginación
-     * @return Página de tópicos
+    /*
+      Lista todos los tópicos con paginación
+
+      @param paginacion Configuración de paginación
+      @return Página de tópicos
      */
     public Page<Topico> listarTopicos(Pageable paginacion) {
         return topicoRepository.findAll(paginacion);
@@ -85,13 +84,14 @@ public class TopicoService {
     // Obtener tópico por ID
     // ============================================
 
-    /**
-     * Busca un tópico por su ID
-     *
-     * @param id ID del tópico
-     * @return Tópico encontrado
-     * @throws TopicoNotFoundException si no existe
+    /*
+      Busca un tópico por su ID
+
+      @param id ID del tópico
+      @return Tópico encontrado
+      @throws TopicoNotFoundException si no existe
      */
+
     public Topico obtenerTopicoPorId(Long id) {
         return topicoRepository.findById(id)
                 .orElseThrow(() -> new TopicoNotFoundException(id));
@@ -101,18 +101,18 @@ public class TopicoService {
     // Actualizar tópico
     // ============================================
 
-    /**
-     * Actualiza un tópico existente
-     * Valida que no se cree duplicado al actualizar
-     * SOLO el autor del tópico o un ADMIN puede actualizarlo
-     *
-     * @param id ID del tópico a actualizar
-     * @param actualizarDTO Datos a actualizar
-     * @return Tópico actualizado
-     * @throws TopicoNotFoundException si el tópico no existe
-     * @throws TopicoDuplicadoException si se crea un duplicado
-     * @throws CursoNotFoundException si el curso no existe
-     * @throws AccesoDenegadoException si no tiene permisos
+    /*
+      Actualiza un tópico existente
+      Valida que no se cree duplicado al actualizar
+      SOLO el autor del tópico o un ADMIN puede actualizarlo
+
+      @param id ID del tópico a actualizar
+      @param actualizarDTO Datos a actualizar
+      @return Tópico actualizado
+      @throws TopicoNotFoundException si el tópico no existe
+      @throws TopicoDuplicadoException si se crea un duplicado
+      @throws CursoNotFoundException si el curso no existe
+      @throws AccesoDenegadoException si no tiene permisos
      */
     @Transactional
     public Topico actualizarTopico(Long id, ActualizarTopicoDTO actualizarDTO) {
@@ -142,13 +142,13 @@ public class TopicoService {
     // Eliminar tópico
     // ============================================
 
-    /**
-     * Elimina un tópico permanentemente
-     * SOLO el autor del tópico o un ADMIN puede eliminarlo
-     *
-     * @param id ID del tópico a eliminar
-     * @throws TopicoNotFoundException si no existe
-     * @throws AccesoDenegadoException si no tiene permisos
+    /*
+      Elimina un tópico permanentemente
+      SOLO el autor del tópico o un ADMIN puede eliminarlo
+
+      @param id ID del tópico a eliminar
+      @throws TopicoNotFoundException si no existe
+      @throws AccesoDenegadoException si no tiene permisos
      */
     @Transactional
     public void eliminarTopico(Long id) {
@@ -164,33 +164,27 @@ public class TopicoService {
     // Métodos privados de validación
     // ============================================
 
-    /**
-     * Valida que no exista un tópico con el mismo título y mensaje
-     *
-     * @throws TopicoDuplicadoException si existe duplicado
-     */
+    // Valida que no exista un tópico con el mismo título y mensaje
+    // @throws TopicoDuplicadoException si existe duplicado
+
     private void validarDuplicado(String titulo, String mensaje) {
         if (topicoRepository.existsByTituloAndMensaje(titulo, mensaje)) {
             throw new TopicoDuplicadoException();
         }
     }
 
-    /**
-     * Valida duplicado al actualizar (excluyendo el tópico actual)
-     *
-     * @throws TopicoDuplicadoException si existe duplicado
-     */
+    // Valida duplicado al actualizar (excluyendo el tópico actual)
+    // @throws TopicoDuplicadoException si existe duplicado
+
     private void validarDuplicadoAlActualizar(String titulo, String mensaje, Long id) {
         if (topicoRepository.existsByTituloAndMensajeAndIdNot(titulo, mensaje, id)) {
             throw new TopicoDuplicadoException();
         }
     }
 
-    /**
-     * Busca un curso por ID
-     *
-     * @throws CursoNotFoundException si no existe
-     */
+    // Busca un curso por ID
+    // @throws CursoNotFoundException si no existe
+
     private Curso buscarCurso(Long id) {
         return cursoRepository.findById(id)
                 .orElseThrow(() -> new CursoNotFoundException(id));

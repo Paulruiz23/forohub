@@ -9,10 +9,9 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-/**
- * Servicio para validar permisos de autorización
- * Verifica si el usuario actual puede realizar acciones sobre recursos
- */
+// Servicio para validar permisos de autorización
+// Verifica si el usuario actual puede realizar acciones sobre recursos
+
 @Service
 public class AutorizacionService {
 
@@ -20,9 +19,8 @@ public class AutorizacionService {
     // Obtener usuario autenticado actual
     // ============================================
 
-    /**
-     * Obtiene el usuario actualmente autenticado desde el contexto de seguridad
-     */
+    // Obtiene el usuario actualmente autenticado desde el contexto de seguridad
+
     public Usuario obtenerUsuarioAutenticado() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return (Usuario) authentication.getPrincipal();
@@ -32,9 +30,8 @@ public class AutorizacionService {
     // Verificar si es ADMIN
     // ============================================
 
-    /**
-     * Verifica si el usuario actual tiene rol ADMIN
-     */
+    // Verifica si el usuario actual tiene rol ADMIN
+
     public boolean esAdmin() {
         return obtenerUsuarioAutenticado().getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
@@ -45,14 +42,14 @@ public class AutorizacionService {
     // Validar permisos sobre Tópico
     // ============================================
 
-    /**
-     * Valida que el usuario actual pueda modificar el tópico
-     * Puede modificar si:
-     * - Es el autor del tópico, O
-     * - Tiene rol ADMIN
-     *
-     * @param topico Tópico a validar
-     * @throws AccesoDenegadoException si no tiene permisos
+    /*
+      Valida que el usuario actual pueda modificar el tópico
+      Puede modificar si:
+      - Es el autor del tópico, O
+      - Tiene rol ADMIN
+
+      @param topico Tópico a validar
+      @throws AccesoDenegadoException si no tiene permisos
      */
     public void validarPermisoParaModificarTopico(Topico topico) {
         Usuario usuarioActual = obtenerUsuarioAutenticado();
@@ -77,14 +74,14 @@ public class AutorizacionService {
     // Validar permisos sobre Respuesta
     // ============================================
 
-    /**
-     * Valida que el usuario actual pueda modificar la respuesta
-     * Puede modificar si:
-     * - Es el autor de la respuesta, O
-     * - Tiene rol ADMIN
-     *
-     * @param respuesta Respuesta a validar
-     * @throws AccesoDenegadoException si no tiene permisos
+    /*
+      Valida que el usuario actual pueda modificar la respuesta
+      Puede modificar si:
+      - Es el autor de la respuesta, O
+      - Tiene rol ADMIN
+
+      @param respuesta Respuesta a validar
+      @throws AccesoDenegadoException si no tiene permisos
      */
     public void validarPermisoParaModificarRespuesta(Respuesta respuesta) {
         Usuario usuarioActual = obtenerUsuarioAutenticado();
@@ -109,14 +106,14 @@ public class AutorizacionService {
     // Validar permisos para marcar solución
     // ============================================
 
-    /**
-     * Valida que el usuario actual pueda marcar una respuesta como solución
-     * Puede marcar si:
-     * - Es el autor del tópico (el que hizo la pregunta), O
-     * - Tiene rol ADMIN
-     *
-     * @param respuesta Respuesta a marcar como solución
-     * @throws AccesoDenegadoException si no tiene permisos
+    /*
+      Valida que el usuario actual pueda marcar una respuesta como solución
+      Puede marcar si:
+      - Es el autor del tópico (el que hizo la pregunta), O
+      - Tiene rol ADMIN
+
+      @param respuesta Respuesta a marcar como solución
+      @throws AccesoDenegadoException si no tiene permisos
      */
     public void validarPermisoParaMarcarSolucion(Respuesta respuesta) {
         Usuario usuarioActual = obtenerUsuarioAutenticado();

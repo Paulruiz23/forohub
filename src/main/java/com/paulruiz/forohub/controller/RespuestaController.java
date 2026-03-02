@@ -19,9 +19,9 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 
-/**
- * Controlador para gestionar respuestas a tópicos
- * Delega la lógica de negocio a RespuestaService
+/*
+  Controlador para gestionar respuestas a tópicos
+  Delega la lógica de negocio a RespuestaService
  */
 @RestController
 @RequestMapping("/respuestas")
@@ -36,21 +36,13 @@ public class RespuestaController {
     // POST - Crear respuesta
     // ============================================
 
-    /**
-     * POST /respuestas - Crear una respuesta a un tópico
-     *
-     * El autor de la respuesta se obtiene automáticamente del usuario autenticado (JWT).
-     * NO es necesario enviar autorId en el request.
-     * Crea la respuesta y actualiza el status del tópico automáticamente.
-     *
-     * Ejemplo en Insomnia:
-     * POST http://localhost:8080/respuestas
-     * Authorization: Bearer [TOKEN]
-     * Body:
-     * {
-     *   "mensaje": "Aquí está la solución...",
-     *   "topicoId": 1
-     * }
+    /*
+      POST /respuestas - Crear una respuesta a un tópico
+
+      El autor de la respuesta se obtiene automáticamente del usuario autenticado (JWT).
+      NO es necesario enviar autorId en el request.
+      Crea la respuesta y actualiza el status del tópico automáticamente.
+
      */
     @PostMapping
     @Operation(
@@ -99,10 +91,10 @@ public class RespuestaController {
     // GET - Detalle de respuesta
     // ============================================
 
-    /**
-     * GET /respuestas/{id} - Obtener detalle de una respuesta
-     *
-     * Retorna información completa de la respuesta.
+    /*
+      GET /respuestas/{id} - Obtener detalle de una respuesta
+
+      Retorna información completa de la respuesta.
      */
     @GetMapping("/{id}")
     @Operation(
@@ -128,11 +120,11 @@ public class RespuestaController {
     // PUT - Actualizar respuesta
     // ============================================
 
-    /**
-     * PUT /respuestas/{id} - Actualizar una respuesta
-     *
-     * Actualiza el mensaje de la respuesta.
-     * SOLO el autor de la respuesta o un ADMIN pueden actualizarla.
+    /*
+      PUT /respuestas/{id} - Actualizar una respuesta
+
+      Actualiza el mensaje de la respuesta.
+      SOLO el autor de la respuesta o un ADMIN pueden actualizarla.
      */
     @PutMapping("/{id}")
     @Operation(
@@ -178,11 +170,11 @@ public class RespuestaController {
     // DELETE - Eliminar respuesta
     // ============================================
 
-    /**
-     * DELETE /respuestas/{id} - Eliminar una respuesta
-     *
-     * Elimina la respuesta y actualiza el status del tópico.
-     * SOLO el autor de la respuesta o un ADMIN pueden eliminarla.
+    /*
+      DELETE /respuestas/{id} - Eliminar una respuesta
+
+      Elimina la respuesta y actualiza el status del tópico.
+      SOLO el autor de la respuesta o un ADMIN pueden eliminarla.
      */
     @DeleteMapping("/{id}")
     @Operation(
@@ -210,11 +202,11 @@ public class RespuestaController {
     // PUT - Marcar como solución
     // ============================================
 
-    /**
-     * PUT /respuestas/{id}/marcar-solucion - Marcar respuesta como solución
-     *
-     * Marca la respuesta como solución aceptada del tópico.
-     * SOLO el autor del tópico (quien hizo la pregunta) o un ADMIN pueden marcarla.
+    /*
+      PUT /respuestas/{id}/marcar-solucion - Marcar respuesta como solución
+
+      Marca la respuesta como solución aceptada del tópico.
+      SOLO el autor del tópico (quien hizo la pregunta) o un ADMIN pueden marcarla.
      */
     @PutMapping("/{id}/marcar-solucion")
     @Operation(

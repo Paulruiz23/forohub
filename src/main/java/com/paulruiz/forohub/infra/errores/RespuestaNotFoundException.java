@@ -1,8 +1,8 @@
 package com.paulruiz.forohub.infra.errores;
 
-/**
- * Excepción lanzada cuando no se encuentra una respuesta en la base de datos
- */
+
+// Excepción lanzada cuando no se encuentra una respuesta en la base de datos
+
 public class RespuestaNotFoundException extends RuntimeException {
 
     public RespuestaNotFoundException(String mensaje) {

@@ -27,8 +27,8 @@ import java.net.URI;
 import java.util.List;
 
 /**
- * Controlador para gestionar tópicos del foro
- * Delega la lógica de negocio a TopicoService
+  Controlador para gestionar tópicos del foro
+  Delega la lógica de negocio a TopicoService
  */
 @RestController
 @RequestMapping("/topicos")
@@ -46,24 +46,15 @@ public class TopicoController {
     // POST - Crear tópico
     // ============================================
 
-    /**
-     * POST /topicos - Crear un nuevo tópico
-     *
-     * El autor del tópico se obtiene automáticamente del usuario autenticado (JWT).
-     * NO es necesario enviar autorId en el request.
-     * Valida que no exista duplicado (mismo título y mensaje).
-     * Crea el tópico con status NO_RESPONDIDO por defecto.
-     * Retorna 201 Created con la URI del recurso creado.
-     *
-     * Ejemplo en Insomnia:
-     * POST http://localhost:8080/topicos
-     * Authorization: Bearer [TOKEN]
-     * Body:
-     * {
-     *   "titulo": "¿Cómo usar Spring Security?",
-     *   "mensaje": "Necesito ayuda con JWT",
-     *   "cursoId": 1
-     * }
+    /*
+      POST /topicos - Crear un nuevo tópico
+
+      El autor del tópico se obtiene automáticamente del usuario autenticado (JWT).
+      NO es necesario enviar autorId en el request.
+      Valida que no exista duplicado (mismo título y mensaje).
+      Crea el tópico con status NO_RESPONDIDO por defecto.
+      Retorna 201 Created con la URI del recurso creado.
+
      */
     @PostMapping
     @Operation(
@@ -112,26 +103,20 @@ public class TopicoController {
     // GET - Listar tópicos
     // ============================================
 
-    /**
-     * GET /topicos - Listar todos los tópicos paginados
-     *
-     * Retorna lista paginada ordenada por fecha de creación descendente (más recientes primero).
-     *
-     * Parámetros opcionales:
-     * - page: Número de página (comienza en 0, default: 0)
-     * - size: Elementos por página (default: 10)
-     * - sort: Campo de ordenamiento (default: fechaCreacion,desc)
-     *
-     * Ejemplos de uso:
-     * GET /topicos (usa defaults: 10 elementos, ordenados por fecha desc)
-     * GET /topicos?page=0&size=5 (primera página, 5 elementos)
-     * GET /topicos?sort=titulo,asc (ordenar por título alfabéticamente)
-     * GET /topicos?sort=status,asc&sort=fechaCreacion,desc (múltiples ordenamientos)
-     *
-     * Campos disponibles para ordenar:
-     * - fechaCreacion: Fecha de creación del tópico
-     * - titulo: Título del tópico
-     * - status: Estado (NO_RESPONDIDO, NO_SOLUCIONADO, SOLUCIONADO)
+    /*
+      GET /topicos - Listar todos los tópicos paginados
+
+      Retorna lista paginada ordenada por fecha de creación descendente (más recientes primero).
+
+      Parámetros opcionales:
+      - page: Número de página (comienza en 0, default: 0)
+      - size: Elementos por página (default: 10)
+      - sort: Campo de ordenamiento (default: fechaCreacion,desc)
+
+      Campos disponibles para ordenar:
+      - fechaCreacion: Fecha de creación del tópico
+      - titulo: Título del tópico
+      - status: Estado (NO_RESPONDIDO, NO_SOLUCIONADO, SOLUCIONADO)
      */
     @GetMapping
     @Operation(
@@ -185,17 +170,14 @@ public class TopicoController {
     // GET - Detalle de tópico
     // ============================================
 
-    /**
-     * GET /topicos/{id} - Obtener detalle de un tópico
-     *
-     * Retorna información completa del tópico incluyendo:
-     * - Datos del tópico (título, mensaje, fecha, status)
-     * - Información del autor
-     * - Información del curso
-     *
-     * Ejemplo en Insomnia:
-     * GET http://localhost:8080/topicos/1
-     * Authorization: Bearer [TOKEN]
+    /*
+      GET /topicos/{id} - Obtener detalle de un tópico
+
+      Retorna información completa del tópico incluyendo:
+      - Datos del tópico (título, mensaje, fecha, status)
+      - Información del autor
+      - Información del curso
+
      */
     @GetMapping("/{id}")
     @Operation(
@@ -220,15 +202,12 @@ public class TopicoController {
     // GET - Respuestas de un tópico
     // ============================================
 
-    /**
-     * GET /topicos/{id}/respuestas - Listar respuestas de un tópico
-     *
-     * Retorna todas las respuestas asociadas al tópico ordenadas por fecha.
-     * Incluye información del autor de cada respuesta y si está marcada como solución.
-     *
-     * Ejemplo en Insomnia:
-     * GET http://localhost:8080/topicos/1/respuestas
-     * Authorization: Bearer [TOKEN]
+    /*
+      GET /topicos/{id}/respuestas - Listar respuestas de un tópico
+
+      Retorna todas las respuestas asociadas al tópico ordenadas por fecha.
+      Incluye información del autor de cada respuesta y si está marcada como solución.
+
      */
     @GetMapping("/{id}/respuestas")
     @Operation(
@@ -259,23 +238,14 @@ public class TopicoController {
     // PUT - Actualizar tópico
     // ============================================
 
-    /**
-     * PUT /topicos/{id} - Actualizar un tópico
-     *
-     * Permite actualizar título, mensaje y/o curso del tópico.
-     * NO permite cambiar el autor del tópico.
-     * SOLO el autor del tópico o un ADMIN pueden actualizarlo.
-     * Valida que no se cree duplicado al actualizar.
-     *
-     * Ejemplo en Insomnia:
-     * PUT http://localhost:8080/topicos/1
-     * Authorization: Bearer [TOKEN]
-     * Body:
-     * {
-     *   "titulo": "¿Cómo usar Spring Security? (Actualizado)",
-     *   "mensaje": "Necesito ayuda urgente con JWT",
-     *   "cursoId": 1
-     * }
+    /*
+      PUT /topicos/{id} - Actualizar un tópico
+
+      Permite actualizar título, mensaje y/o curso del tópico.
+      NO permite cambiar el autor del tópico.
+      SOLO el autor del tópico o un ADMIN pueden actualizarlo.
+      Valida que no se cree duplicado al actualizar.
+
      */
     @PutMapping("/{id}")
     @Operation(
@@ -322,18 +292,15 @@ public class TopicoController {
     // DELETE - Eliminar tópico
     // ============================================
 
-    /**
-     * DELETE /topicos/{id} - Eliminar un tópico
-     *
-     * Elimina permanentemente el tópico y todas sus respuestas asociadas (CASCADE).
-     * SOLO el autor del tópico o un ADMIN pueden eliminarlo.
-     * Esta acción NO es reversible.
-     * Retorna 204 No Content si la eliminación es exitosa.
-     *
-     * Ejemplo en Insomnia:
-     * DELETE http://localhost:8080/topicos/1
-     * Authorization: Bearer [TOKEN]
-     */
+    /*
+      DELETE /topicos/{id} - Eliminar un tópico
+
+      Elimina permanentemente el tópico y todas sus respuestas asociadas (CASCADE).
+      SOLO el autor del tópico o un ADMIN pueden eliminarlo.
+      Esta acción NO es reversible.
+      Retorna 204 No Content si la eliminación es exitosa.
+
+    */
     @DeleteMapping("/{id}")
     @Operation(
             summary = "Eliminar un tópico",

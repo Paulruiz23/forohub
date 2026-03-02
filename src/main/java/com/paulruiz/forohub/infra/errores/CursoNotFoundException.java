@@ -1,8 +1,8 @@
 package com.paulruiz.forohub.infra.errores;
 
-/**
- * Excepción lanzada cuando no se encuentra un curso en la base de datos
- */
+
+// Excepción lanzada cuando no se encuentra un curso en la base de datos
+
 public class CursoNotFoundException extends RuntimeException {
 
     public CursoNotFoundException(String mensaje) {
