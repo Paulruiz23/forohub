@@ -2,7 +2,10 @@ package com.paulruiz.forohub.service;
 
 import com.paulruiz.forohub.dto.RegistroUsuarioDTO;
 import com.paulruiz.forohub.infra.errores.EmailDuplicadoException;
-import com.paulruiz.forohub.infra.errores.EntityNotFoundException;
+import com.paulruiz.forohub.infra.errores.PerfilNotFoundException;
+import com.paulruiz.forohub.infra.errores.UsuarioActivoException;
+import com.paulruiz.forohub.infra.errores.UsuarioBloqueadoException;
+import com.paulruiz.forohub.infra.errores.UsuarioNotFoundException;
 import com.paulruiz.forohub.model.Perfil;
 import com.paulruiz.forohub.model.Usuario;
 import com.paulruiz.forohub.repository.PerfilRepository;
@@ -15,9 +18,9 @@ import org.springframework.stereotype.Service;
 import java.util.HashSet;
 import java.util.Set;
 
-
-// Servicio que contiene la lógica de negocio para Usuarios
-
+/**
+ * Servicio que contiene la lógica de negocio para Usuarios
+ */
 @Service
 public class UsuarioService {
 
@@ -34,13 +37,14 @@ public class UsuarioService {
     // Registrar usuario
     // ============================================
 
-    /*
-      Registra un nuevo usuario en el sistema
-      Encripta la contraseña y asigna rol USER por defecto
-
-      @param registroDTO Datos del usuario
-      @return Usuario creado
-      @throws EmailDuplicadoException si el email ya existe
+    /**
+     * Registra un nuevo usuario en el sistema
+     * Encripta la contraseña y asigna rol USER por defecto
+     *
+     * @param registroDTO Datos del usuario
+     * @return Usuario creado
+     * @throws EmailDuplicadoException si el email ya existe
+     * @throws PerfilNotFoundException si no existe el rol USER
      */
     @Transactional
     public Usuario registrarUsuario(RegistroUsuarioDTO registroDTO) {
@@ -60,9 +64,11 @@ public class UsuarioService {
 
         usuario.setActivo(true);
 
-        // Asignar perfil USER
+        // ============================================
+        // Asignar perfil USER - CORREGIDO
+        // ============================================
         Perfil perfilUser = perfilRepository.findByNombre("ROLE_USER")
-                .orElseThrow(() -> new EntityNotFoundException("Perfil ROLE_USER no encontrado"));
+                .orElseThrow(() -> PerfilNotFoundException.porNombre("ROLE_USER"));
 
         Set<Perfil> perfiles = new HashSet<>();
         perfiles.add(perfilUser);
@@ -76,27 +82,29 @@ public class UsuarioService {
     // Obtener usuario por ID
     // ============================================
 
-    /*
-      Busca un usuario por su ID
-
-      @param id ID del usuario
-      @return Usuario encontrado
+    /**
+     * Busca un usuario por su ID
+     *
+     * @param id ID del usuario
+     * @return Usuario encontrado
+     * @throws UsuarioNotFoundException si no existe
      */
     public Usuario obtenerUsuarioPorId(Long id) {
         return usuarioRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(
-                        "Usuario con ID " + id + " no encontrado"));
+                .orElseThrow(() -> new UsuarioNotFoundException(id));
     }
 
     // ============================================
     // Bloquear usuario
     // ============================================
 
-    /*
-      Bloquea un usuario (soft delete)
-      El usuario no puede hacer login pero sus datos permanecen
-
-      @param id ID del usuario a bloquear
+    /**
+     * Bloquea un usuario (soft delete)
+     * El usuario no puede hacer login pero sus datos permanecen
+     *
+     * @param id ID del usuario a bloquear
+     * @throws UsuarioNotFoundException si no existe
+     * @throws UsuarioBloqueadoException si ya está bloqueado
      */
     @Transactional
     public void bloquearUsuario(Long id) {
@@ -104,7 +112,7 @@ public class UsuarioService {
 
         // Validar que no esté ya bloqueado
         if (!usuario.getActivo()) {
-            throw new RuntimeException("El usuario ya está bloqueado");
+            throw new UsuarioBloqueadoException();
         }
 
         // Marcar como inactivo
@@ -115,11 +123,13 @@ public class UsuarioService {
     // Desbloquear usuario
     // ============================================
 
-    /*
-      Desbloquea un usuario previamente bloqueado
-
-      @param id ID del usuario a desbloquear
-      @return Usuario desbloqueado
+    /**
+     * Desbloquea un usuario previamente bloqueado
+     *
+     * @param id ID del usuario a desbloquear
+     * @return Usuario desbloqueado
+     * @throws UsuarioNotFoundException si no existe
+     * @throws UsuarioActivoException si ya está activo
      */
     @Transactional
     public Usuario desbloquearUsuario(Long id) {
@@ -127,7 +137,7 @@ public class UsuarioService {
 
         // Validar que esté bloqueado
         if (usuario.getActivo()) {
-            throw new RuntimeException("El usuario ya está activo");
+            throw new UsuarioActivoException();
         }
 
         // Marcar como activo
